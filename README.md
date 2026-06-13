@@ -35,7 +35,7 @@ python server.py
 
 Open:
 
-http://127.0.0.1:5000
+cozy-rugelach-a292d8.netlify.app
 
 ## Disclaimer
 
