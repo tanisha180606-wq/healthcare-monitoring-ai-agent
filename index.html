@@ -101,6 +101,10 @@ button {
     font-size: 15px;
 }
 
+button:hover {
+    background: #0a4f3d;
+}
+
 .disclaimer {
     background: #fff3cd;
     border-left: 5px solid #ff9800;
@@ -140,7 +144,8 @@ button {
 
     <div class="chat-box" id="chatBox">
         <div class="message ai">
-Hello! Enter your disease, symptoms, or health problem. I will suggest specialist doctor, tests/scans, risk level, and safety guidance.
+Hello! I am Diagnostics AI.
+Enter your disease, symptoms, or health problem. I will suggest specialist doctor, tests/scans, risk level, and safety guidance.
         </div>
     </div>
 
@@ -154,6 +159,34 @@ Hello! Enter your disease, symptoms, or health problem. I will suggest specialis
 <script>
 let selectedAgent = "Diagnostics AI";
 
+function getWelcomeMessage(agentName) {
+    if (agentName === "Diagnostics AI") {
+        return "🩺 Hello! I am Diagnostics AI.\nEnter symptoms or disease and I will suggest risk level, specialist doctor and tests.";
+    }
+
+    if (agentName === "Pharmacology AI") {
+        return "💊 Hello! I am Pharmacology AI.\nAsk about medicine guidance, side effects, timing, and safety precautions.";
+    }
+
+    if (agentName === "Radiology AI") {
+        return "🩻 Hello! I am Radiology AI.\nAsk about X-ray, MRI, CT scan, ultrasound, PET scan or imaging guidance.";
+    }
+
+    if (agentName === "Mental Health AI") {
+        return "🧠 Hello! I am Mental Health AI.\nAsk about stress, anxiety, depression, sleep issues, and mental wellness guidance.";
+    }
+
+    if (agentName === "Lab AI") {
+        return "🧪 Hello! I am Lab AI.\nAsk about blood tests, urine tests, stool tests, ECG, EEG and lab investigations.";
+    }
+
+    if (agentName === "Surgical AI") {
+        return "🏥 Hello! I am Surgical AI.\nAsk about surgery-related problems, fracture, tumor, biopsy and post-surgery care.";
+    }
+
+    return "Hello! Enter your health problem.";
+}
+
 function selectAgent(element, agentName) {
     selectedAgent = agentName;
 
@@ -162,7 +195,17 @@ function selectAgent(element, agentName) {
     });
 
     element.classList.add("active");
+
     document.getElementById("agentTitle").innerText = agentName;
+    document.getElementById("userInput").value = "";
+
+    const chatBox = document.getElementById("chatBox");
+
+    chatBox.innerHTML = `
+        <div class="message ai">
+${getWelcomeMessage(agentName)}
+        </div>
+    `;
 }
 
 function generateLocalAIReply(text) {
@@ -172,6 +215,7 @@ function generateLocalAIReply(text) {
     let specialist = "General Physician";
     let tests = "Basic vitals check";
     let warning = "Monitor symptoms. Visit doctor if symptoms continue.";
+    let extra = "";
 
     if (text.includes("dengue")) {
         risk = "🔴 High Risk";
@@ -220,6 +264,37 @@ function generateLocalAIReply(text) {
         specialist = "Psychiatrist / Psychologist";
         tests = "Mental health assessment";
     }
+    else if (text.includes("fever")) {
+        risk = "🟡 Medium Risk";
+        specialist = "Internal Medicine Physician";
+        tests = "CBC blood test, temperature check";
+    }
+    else if (text.includes("asthma") || text.includes("breathing")) {
+        risk = "🟠 Needs Monitoring";
+        specialist = "Pulmonologist";
+        tests = "Spirometry, peak flow test, chest X-ray";
+    }
+    else if (text.includes("stomach") || text.includes("vomiting") || text.includes("diarrhea")) {
+        risk = "🟡 Needs Specialist";
+        specialist = "Gastroenterologist";
+        tests = "Stool test, urine test, ultrasound if needed";
+    }
+
+    if (selectedAgent === "Pharmacology AI") {
+        extra = "Medicine Guidance:\nDo not self-medicate. Take medicines only after doctor or guardian advice.";
+    }
+    else if (selectedAgent === "Radiology AI") {
+        extra = "Imaging Guidance:\nImaging like X-ray, MRI, CT scan or ultrasound should be done only when doctor suggests.";
+    }
+    else if (selectedAgent === "Mental Health AI") {
+        extra = "Mental Wellness Guidance:\nTalk to a trusted person, maintain sleep routine, and consult a mental health professional if symptoms continue.";
+    }
+    else if (selectedAgent === "Lab AI") {
+        extra = "Lab Guidance:\nReports should be interpreted by a qualified doctor with symptoms and medical history.";
+    }
+    else if (selectedAgent === "Surgical AI") {
+        extra = "Surgical Guidance:\nSurgical decisions need hospital evaluation and specialist surgeon consultation.";
+    }
 
     return `
 🏥 HEALTHMIND AI REPORT
@@ -243,6 +318,8 @@ Avoid junk food, oily food, and cold drinks.
 Warning:
 ${warning}
 
+${extra}
+
 Safety Note:
 This AI gives educational guidance only.
 It does not replace a doctor.
@@ -254,10 +331,7 @@ function sendMessage() {
     const chatBox = document.getElementById("chatBox");
     const text = input.value.trim();
 
-    if (text === "") {
-        alert("Please enter symptoms or disease.");
-        return;
-    }
+    if (text === "") return;
 
     chatBox.innerHTML += `<div class="message user">${text}</div>`;
     input.value = "";
@@ -266,7 +340,8 @@ function sendMessage() {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     setTimeout(() => {
-        document.getElementById("loading").remove();
+        const loading = document.getElementById("loading");
+        if (loading) loading.remove();
 
         const reply = generateLocalAIReply(text);
 
@@ -274,6 +349,13 @@ function sendMessage() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }, 700);
 }
+
+document.getElementById("userInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
 </script>
 
 </body>
