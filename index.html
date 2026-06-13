@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthMind AI</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef5f3;
+    color: #1a1a1a;
+}
+
+header {
+    background: #0F6E56;
+    color: white;
+    padding: 18px;
+    text-align: center;
+}
+
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.agent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.agent {
+    padding: 15px;
+    border-radius: 12px;
+    background: #E1F5EE;
+    border: 1px solid #0F6E56;
+    cursor: pointer;
+    text-align: center;
+}
+
+.agent.active {
+    background: #0F6E56;
+    color: white;
+}
+
+.chat-box {
+    height: 350px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 15px;
+    background: #fafafa;
+    margin-bottom: 15px;
+}
+
+.message {
+    margin: 10px 0;
+    padding: 12px;
+    border-radius: 10px;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.user {
+    background: #dbeafe;
+    text-align: right;
+}
+
+.ai {
+    background: #e6f7ed;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+}
+
+textarea {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #aaa;
+    resize: none;
+    font-size: 15px;
+}
+
+button {
+    background: #0F6E56;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.disclaimer {
+    background: #fff3cd;
+    border-left: 5px solid #ff9800;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🏥 HealthMind AI</h1>
+    <p>Agentic Healthcare Support Platform</p>
+</header>
+
+<div class="container">
+
+    <div class="disclaimer">
+        ⚠️ This AI gives educational health guidance only. It does not replace a doctor.
+    </div>
+
+    <h2>Select AI Agent</h2>
+
+    <div class="agent-grid">
+        <div class="agent active" onclick="selectAgent(this, 'Diagnostics AI')">🩺 Diagnostics AI</div>
+        <div class="agent" onclick="selectAgent(this, 'Pharmacology AI')">💊 Pharmacology AI</div>
+        <div class="agent" onclick="selectAgent(this, 'Radiology AI')">🩻 Radiology AI</div>
+        <div class="agent" onclick="selectAgent(this, 'Mental Health AI')">🧠 Mental Health AI</div>
+        <div class="agent" onclick="selectAgent(this, 'Lab AI')">🧪 Lab AI</div>
+        <div class="agent" onclick="selectAgent(this, 'Surgical AI')">🏥 Surgical AI</div>
+    </div>
+
+    <h2 id="agentTitle">Diagnostics AI</h2>
+
+    <div class="chat-box" id="chatBox">
+        <div class="message ai">
+Hello! Enter your disease, symptoms, or health problem. I will suggest specialist doctor, tests/scans, risk level, and safety guidance.
+        </div>
+    </div>
+
+    <div class="input-area">
+        <textarea id="userInput" rows="2" placeholder="Example: dengue fever, chest pain, kidney stone, headache"></textarea>
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+</div>
+
+<script>
+let selectedAgent = "Diagnostics AI";
+
+function selectAgent(element, agentName) {
+    selectedAgent = agentName;
+
+    document.querySelectorAll(".agent").forEach(agent => {
+        agent.classList.remove("active");
+    });
+
+    element.classList.add("active");
+    document.getElementById("agentTitle").innerText = agentName;
+}
+
+function generateLocalAIReply(text) {
+    text = text.toLowerCase();
+
+    let risk = "🟢 Low Risk";
+    let specialist = "General Physician";
+    let tests = "Basic vitals check";
+    let warning = "Monitor symptoms. Visit doctor if symptoms continue.";
+
+    if (text.includes("dengue")) {
+        risk = "🔴 High Risk";
+        specialist = "Infectious Disease Specialist";
+        tests = "Dengue NS1, IgM/IgG, CBC platelet count";
+        warning = "Dengue can reduce platelets. Consult doctor immediately.";
+    }
+    else if (text.includes("diabetes")) {
+        risk = "🟡 Needs Monitoring";
+        specialist = "Endocrinologist / Diabetologist";
+        tests = "Fasting sugar, PP sugar, HbA1c";
+    }
+    else if (text.includes("chest pain") || text.includes("heart attack")) {
+        risk = "🔴 Emergency";
+        specialist = "Cardiologist / Emergency Physician";
+        tests = "ECG, cardiac enzymes, chest X-ray";
+        warning = "Go to hospital immediately.";
+    }
+    else if (text.includes("headache") || text.includes("migraine")) {
+        risk = "🟡 Medium Risk";
+        specialist = "Neurologist";
+        tests = "BP check, eye checkup, MRI if severe";
+    }
+    else if (text.includes("kidney stone")) {
+        risk = "🟡 Needs Specialist";
+        specialist = "Urologist";
+        tests = "Urine test, ultrasound, CT KUB";
+    }
+    else if (text.includes("cough") || text.includes("cold")) {
+        risk = "🟡 Mild/Moderate";
+        specialist = "ENT Specialist / Pulmonologist";
+        tests = "Throat check, chest X-ray if severe";
+    }
+    else if (text.includes("fracture") || text.includes("bone")) {
+        risk = "🔴 High Risk";
+        specialist = "Orthopedic Surgeon";
+        tests = "X-ray, CT scan if needed";
+    }
+    else if (text.includes("skin") || text.includes("rash")) {
+        risk = "🟡 Needs Specialist";
+        specialist = "Dermatologist";
+        tests = "Skin examination, allergy test if needed";
+    }
+    else if (text.includes("anxiety") || text.includes("depression")) {
+        risk = "🟡 Mental Health Support Needed";
+        specialist = "Psychiatrist / Psychologist";
+        tests = "Mental health assessment";
+    }
+
+    return `
+🏥 HEALTHMIND AI REPORT
+
+Selected Agent:
+${selectedAgent}
+
+Risk Level:
+${risk}
+
+Recommended Specialist:
+Meet ${specialist}
+
+Suggested Tests / Scans:
+${tests}
+
+Food Guidance:
+Eat fruits, vegetables, warm food, soup, and drink enough water.
+Avoid junk food, oily food, and cold drinks.
+
+Warning:
+${warning}
+
+Safety Note:
+This AI gives educational guidance only.
+It does not replace a doctor.
+`;
+}
+
+function sendMessage() {
+    const input = document.getElementById("userInput");
+    const chatBox = document.getElementById("chatBox");
+    const text = input.value.trim();
+
+    if (text === "") {
+        alert("Please enter symptoms or disease.");
+        return;
+    }
+
+    chatBox.innerHTML += `<div class="message user">${text}</div>`;
+    input.value = "";
+
+    chatBox.innerHTML += `<div class="message ai" id="loading">Thinking...</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    setTimeout(() => {
+        document.getElementById("loading").remove();
+
+        const reply = generateLocalAIReply(text);
+
+        chatBox.innerHTML += `<div class="message ai">${reply}</div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }, 700);
+}
+</script>
+
+</body>
+</html>
